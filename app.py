@@ -29,6 +29,12 @@ def create_prediction_log(audio_filename, prediction):
         # Write the prediction log
         writer.writerow([datetime.datetime.now(), audio_filename, prediction])
 
+# Function to read the CSV file to download
+def read_csv_for_download(file_path):
+    with open(file_path, "r") as f:
+        csv_content = f.read()
+    return csv_content
+
 # Upload the audio file
 audio_file = st.file_uploader("Upload an audio file", type=["wav", "mp3"], help="Upload the audio file of the patient.")
 
@@ -67,3 +73,13 @@ if audio_file:
         # Log the prediction with the audio file name and current timestamp
         create_prediction_log(audio_file.name, pred_label)
         st.success(f"Prediction saved: {audio_file.name} -> {pred_label}")
+
+
+        # Provide a download button for the CSV file
+        csv_data = read_csv_for_download(PREDICTION_LOG_FILE)
+        st.download_button(
+            label="Download Prediction Log",
+            data=csv_data,
+            file_name=PREDICTION_LOG_FILE,
+            mime="text/csv",
+        )
