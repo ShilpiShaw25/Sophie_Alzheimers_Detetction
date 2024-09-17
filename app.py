@@ -5,20 +5,15 @@ import os
 import csv
 import datetime
 
-# Directory to save audio files
-AUDIO_DIR = "uploaded_audios"
-AUDIO_FILE_NAME = os.path.join(AUDIO_DIR, "uploaded_audio.wav")
-PREDICTION_LOG_FILE = "prediction_log.csv"
 
-# Create the directory if it doesn't exist
-os.makedirs(AUDIO_DIR, exist_ok=True)
+PREDICTION_LOG_FILE = "prediction_log.csv"
 
 # Set the title
 st.title("Alzheimer's Detection")
 
 # Function to log predictions to CSV
 def create_prediction_log(audio_filename, prediction):
-    # Check if the CSV exists; if not, create it and write headers
+    # Check if the CSV exists; if not, create it 
     file_exists = os.path.isfile(PREDICTION_LOG_FILE)
     
     with open(PREDICTION_LOG_FILE, mode='a', newline='') as file:
@@ -40,7 +35,6 @@ audio_file = st.file_uploader("Upload an audio file", type=["wav", "mp3"], help=
 
 if audio_file:
     # Save the uploaded audio file
-    saved_audio_path = os.path.join(AUDIO_DIR, audio_file.name)
     with open(saved_audio_path, "wb") as f:
         f.write(audio_file.getbuffer())
         st.toast("Audio Reading Successful", icon="✅")
