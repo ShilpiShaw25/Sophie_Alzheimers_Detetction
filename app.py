@@ -78,8 +78,8 @@ if audio_file:
         # Provide a download button for the CSV file
         csv_data = read_csv_for_download(PREDICTION_LOG_FILE)
         st.download_button(
-            label="Download Prediction Log",
+            label="Download Prediction Logs",
             data=csv_data,
             file_name=PREDICTION_LOG_FILE,
-            mime="text/csv",
+            mime=None,
         )
