@@ -1,52 +1,45 @@
 import streamlit as st
-import csv
+from Utils import audio_to_spectrogram, get_prediction, image_to_convert
+from Utils import IMAGE_NAME
 import os
+import csv
 import datetime
-import pandas as pd
 
+# Directory to save audio files
+AUDIO_DIR = "uploaded_audios"
+AUDIO_FILE_NAME = os.path.join(AUDIO_DIR, "uploaded_audio.wav")
 PREDICTION_LOG_FILE = "prediction_log.csv"
+
+# Create the directory if it doesn't exist
+os.makedirs(AUDIO_DIR, exist_ok=True)
+
+# Set the title
+st.title("Alzheimer's Detection")
 
 # Function to log predictions to CSV
 def log_prediction(audio_filename, prediction):
+    # Check if the CSV exists; if not, create it and write headers
     file_exists = os.path.isfile(PREDICTION_LOG_FILE)
-
+    
     with open(PREDICTION_LOG_FILE, mode='a', newline='') as file:
         writer = csv.writer(file)
         if not file_exists:
             writer.writerow(["Timestamp", "Audio File", "Prediction"])
-
+        
+        # Write the prediction log
         writer.writerow([datetime.datetime.now(), audio_filename, prediction])
 
-# Function to download CSV file
-def download_csv():
-    if os.path.exists(PREDICTION_LOG_FILE):
-        # Read CSV file into a pandas DataFrame
-        df = pd.read_csv(PREDICTION_LOG_FILE)
-        # Convert DataFrame to CSV
-        csv_data = df.to_csv(index=False)
-        # Provide a download link for the CSV
-        st.download_button(label="Download Prediction Log", 
-                           data=csv_data,
-                           file_name=PREDICTION_LOG_FILE,
-                           mime='text/csv')
-    else:
-        st.warning("No prediction log available to download yet.")
-
-# App logic
-st.title("Alzheimer's Detection")
-
-AUDIO_DIR = "uploaded_audios"
-os.makedirs(AUDIO_DIR, exist_ok=True)
-
+# Upload the audio file
 audio_file = st.file_uploader("Upload an audio file", type=["wav", "mp3"], help="Upload the audio file of the patient.")
 
 if audio_file:
+    # Save the uploaded audio file
     saved_audio_path = os.path.join(AUDIO_DIR, audio_file.name)
     with open(saved_audio_path, "wb") as f:
         f.write(audio_file.getbuffer())
         st.toast("Audio Reading Successful", icon="✅")
 
-    # Generate and save the spectrogram
+    # Generate the spectrogram
     spec_results = audio_to_spectrogram(saved_audio_path)
     if not spec_results:
         st.error("Spectrogram Saving Failed", icon="❌")
@@ -54,20 +47,23 @@ if audio_file:
         st.toast("Spectrogram Saving Successful", icon="✅")
 
         # Display the audio and spectrogram
-        st.sidebar.header("Uploaded Audio")
-        st.audio(saved_audio_path)
+        with st.sidebar:
+            st.title("Alzheimer's Detection")
+            # Display the uploaded audio
+            st.header("Uploaded Audio")
+            st.audio(saved_audio_path)
 
-        st.sidebar.header("Generated Spectrogram")
-        st.image(IMAGE_NAME)
+            # Display the generated spectrogram
+            st.header("Generated Spectrogram")
+            st.image(IMAGE_NAME)
 
-        # Convert to bytes for prediction
+        # Convert spectrogram to bytes
         image_conversion = image_to_convert(IMAGE_NAME)
-        pred_label = get_prediction(image_conversion)
-        st.subheader(f"Condition: {pred_label}")
 
-        # Log the prediction
+        # Get prediction
+        pred_label = get_prediction(image_conversion)
+        st.subheader("Condition: {}".format(pred_label))
+
+        # Log the prediction with the audio file name and current timestamp
         log_prediction(audio_file.name, pred_label)
         st.success(f"Prediction saved: {audio_file.name} -> {pred_label}")
-
-# Add download button for CSV file
-download_csv()
