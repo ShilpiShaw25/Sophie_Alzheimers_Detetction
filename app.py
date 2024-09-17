@@ -8,7 +8,6 @@ import datetime
 
 AUDIO_DIR = "uploaded_audios"
 AUDIO_FILE_NAME = os.path.join(AUDIO_DIR, "uploaded_audio.wav")
-#Create the directory if it doesn't exist
 os.makedirs(AUDIO_DIR, exist_ok=True)
 
 PREDICTION_LOG_FILE = "prediction_log.csv"
