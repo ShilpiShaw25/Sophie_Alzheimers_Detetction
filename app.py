@@ -6,6 +6,11 @@ import csv
 import datetime
 
 
+AUDIO_DIR = "uploaded_audios"
+AUDIO_FILE_NAME = os.path.join(AUDIO_DIR, "uploaded_audio.wav")
+#Create the directory if it doesn't exist
+os.makedirs(AUDIO_DIR, exist_ok=True)
+
 PREDICTION_LOG_FILE = "prediction_log.csv"
 
 # Set the title
@@ -35,6 +40,7 @@ audio_file = st.file_uploader("Upload an audio file", type=["wav", "mp3"], help=
 
 if audio_file:
     # Save the uploaded audio file
+    saved_audio_path = os.path.join(AUDIO_DIR, audio_file.name)
     with open(saved_audio_path, "wb") as f:
         f.write(audio_file.getbuffer())
         st.toast("Audio Reading Successful", icon="✅")
