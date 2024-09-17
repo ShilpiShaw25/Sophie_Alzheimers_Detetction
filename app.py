@@ -17,7 +17,7 @@ os.makedirs(AUDIO_DIR, exist_ok=True)
 st.title("Alzheimer's Detection")
 
 # Function to log predictions to CSV
-def log_prediction(audio_filename, prediction):
+def create_prediction_log(audio_filename, prediction):
     # Check if the CSV exists; if not, create it and write headers
     file_exists = os.path.isfile(PREDICTION_LOG_FILE)
     
@@ -65,5 +65,5 @@ if audio_file:
         st.subheader("Condition: {}".format(pred_label))
 
         # Log the prediction with the audio file name and current timestamp
-        log_prediction(audio_file.name, pred_label)
+        create_prediction_log(audio_file.name, pred_label)
         st.success(f"Prediction saved: {audio_file.name} -> {pred_label}")
